@@ -21,7 +21,7 @@ This is a FastAPI template which can be deployed to [Google Cloud Run](https://c
 
 This template can be used to deploy your FastAPI application as a Docker container.
 
-1. Deploy to Cloud Run: `gcloud run deploy example1 --source=. --allow-unauthenticated --region=us-west1`.
+1. Deploy to Cloud Run: `gcloud run deploy dinnercaster3 --source=. --allow-unauthenticated --region=us-west1`.
 
 ## Learn More
 
