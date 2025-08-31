@@ -85,18 +85,104 @@ async def mcp_info():
         "description": "MCP server with FastAPI web interface"
     }
 
-@app.get("/mcp")
-async def mcp_endpoint():
-    """MCP server endpoint for claude.ai"""
-    return {
-        "mcp_server": "dinnercaster3",
-        "status": "available",
-        "endpoints": {
-            "echo": "/echo",
-            "info": "/info",
-            "health": "/health"
+@app.post("/mcp")
+async def mcp_post_endpoint(request: dict):
+    """Handle MCP protocol requests"""
+    try:
+        # Handle different MCP request types
+        method = request.get("method")
+
+        if method == "initialize":
+            return {
+                "jsonrpc": "2.0",
+                "result": {
+                    "protocolVersion": "2024-11-05",
+                    "capabilities": {
+                        "tools": {}
+                    },
+                    "serverInfo": {
+                        "name": "dinnercaster3",
+                        "version": "1.0.0"
+                    }
+                },
+                "id": request.get("id", 1)
+            }
+        elif method == "tools/list":
+            return {
+                "jsonrpc": "2.0",
+                "result": {
+                    "tools": [
+                        {
+                            "name": "echo",
+                            "description": "Echo back the input text",
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {
+                                    "text": {"type": "string"}
+                                },
+                                "required": ["text"]
+                            }
+                        },
+                        {
+                            "name": "get_info",
+                            "description": "Get information about the Dinnercaster3 service",
+                            "inputSchema": {
+                                "type": "object",
+                                "properties": {}
+                            }
+                        }
+                    ]
+                },
+                "id": request.get("id", 1)
+            }
+        elif method == "tools/call":
+            tool_name = request.get("params", {}).get("name")
+            arguments = request.get("params", {}).get("arguments", {})
+
+            if tool_name == "echo":
+                result = echo(arguments.get("text", ""))
+            elif tool_name == "get_info":
+                result = get_info()
+            else:
+                return {
+                    "jsonrpc": "2.0",
+                    "error": {
+                        "code": -32601,
+                        "message": "Method not found"
+                    },
+                    "id": request.get("id", 1)
+                }
+
+            return {
+                "jsonrpc": "2.0",
+                "result": {
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": str(result)
+                        }
+                    ]
+                },
+                "id": request.get("id", 1)
+            }
+        else:
+            return {
+                "jsonrpc": "2.0",
+                "error": {
+                    "code": -32601,
+                    "message": "Method not found"
+                },
+                "id": request.get("id", 1)
+            }
+    except Exception as e:
+        return {
+            "jsonrpc": "2.0",
+            "error": {
+                "code": -32603,
+                "message": f"Internal error: {str(e)}"
+            },
+            "id": request.get("id", 1)
         }
-    }
 
 if __name__ == "__main__":
     import sys
