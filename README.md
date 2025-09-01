@@ -31,3 +31,23 @@ To learn more about FastAPI, take a look at the following resources:
 - [FastAPI Tutorial](https://fastapi.tiangolo.com/tutorial/) - an interactive FastAPI tutorial.
 
 You can check out [the FastAPI GitHub repository](https://github.com/tiangolo/fastapi) - your feedback and contributions are welcome!
+
+## Use MCP servers in Claude Desktop
+```
+{
+    "mcpServers": {
+      "weather": {
+        "command": "HARDCODED_PATH_HERE/uv",
+        "args": ["--directory", "HARDCODED_PATH_HERE/weather-server-python", "run", "weather.py"]
+      },
+      "dinnercaster3-npx": {
+        "command": "npx",
+        "args": [
+          "-y",
+          "mcp-remote",
+          "https://dinnercaster3-mcp-000000000000.us-west1.run.app/mcp"
+        ]
+      }
+    }
+  }
+```
